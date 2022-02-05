@@ -3,13 +3,13 @@
 A system for dispatching on conjunctions of traits.
 
 Basic idea:
-1. Type hierarchies are oppresive, we'd rather simply specify that values and types have particular properties.  For instance that the type is indexable.  We call these properties traits
+1. Type hierarchies are oppresive — we'd rather simply specify that values and types have particular properties.  For instance that the type is indexable.  Sometimes these kinds of properties are called [traits](https://en.wikipedia.org/wiki/Trait_(computer_programming)).
 2. Often we want to write methods that are specific to particular combinations of traits.  That is, we want to say:
-  (i) do something if type has trait A
-  (ii) do something else if type has trait A and B
-  (iii) do something else lse if type has trait A and B and C
+  1. do something if type has trait A
+  2. do something else if type has trait A and B
+  3. do something else if type has trait A and B and C
 
-There are many implementations of traits in Julia which do 1 but to as far as I am aware this is the first approach that does 2.
+There are many implementations of traits in Julia which do 1 but as far as I am aware this is the first approach that supports conjunctions of traits.
 
 ## How to use it
 

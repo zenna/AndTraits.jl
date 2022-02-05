@@ -2,30 +2,17 @@ using Test
 using AndTraits
 using AndTraits: Trait
 
-# Make a trait
-Err = Trait{:Err}
-Whut = Trait{:Whut}
+const Iterable = Trait{:Iterable}
+const Indexable = Trait{:Indexable}
+const Smelly = Trait{:Smelly}
+AndTraits.traits(::Vector) = Iterable ∧ Indexable
+AndTraits.traits(::Set) = Iterable
 
-# Construct a new type
-struct MyType{T}
-  x::T
-end
+g(x) = g(traits(x), x)
+g(::traitmatch(Iterable), x) = "This is a string"
+g(::traitmatch(Iterable, Indexable), x) = 21
 
-AndTraits.traits(::MyType{T}) where T = traits(T)
-
-const a = MyType((Err = 10,))
-const b = MyType((Whut = 10,))
-const c = MyType((Whut = 10, Err = 10))
-
-f(x) = f(traits(x), x)
-f(::trait(Err), x) = "Hello" 
-f(::trait(Whut), x) = 2 
-f(::trait(Err, Whut), x) = :Howdy
-
-@test f(a) == "Hello"
-@test f(b) == 2
-@test f(c) == :Howdy
-
-@inferred f(a)
-@inferred f(b)
-@inferred f(c)
+const x = [1, 2, 3]
+@inferred g(x)
+@inferred g(Set([1,2,3]))
+@test_throws MethodError g(12)

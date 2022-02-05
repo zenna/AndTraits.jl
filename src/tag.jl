@@ -1,21 +1,15 @@
-export traits, Trait
+export Trait, ∧, conjointraits
 
-"Returns the traits of an objec"
-function traits end
+# "Returns the traits of an objec"
+# function traits end
+struct ATrait{T} end
 
-"Meta data to attach to ω::Ω"
-const Tags = NamedTuple
+Trait{T} = AndTrait{Union{ATrait{T}}}
 
-struct Trait{T} end
+(∧)(t1::Type{AndTrait{T1}}, t2::Type{AndTrait{T2}}) where {T1, T2} =
+  conjointraits(t1, t2)
 
-symtotrait(x::Symbol) = Trait{x}
+conjointraits(::Type{AndTrait{T1}}, ::Type{AndTrait{T2}}) where {T1, T2} =
+  AndTrait{Union{T1, T2}}
 
-@generated function traits(k::Tags{K, V}) where {K, V}
-  traits_ = map(symtotrait, K)
-  AndTrait{Union{traits_...}}()
-end
-
-@generated function traits(k::Type{Tags{K, V}}) where {K, V}
-  traits_ = map(symtotrait, K)
-  AndTrait{Union{traits_...}}()
-end
+conjointraits(t1, t2, ts...) = conjointraits(conjointraits(t1, t2), ts...)
