@@ -1,4 +1,4 @@
-export traitmatch, AndTrait
+export traitmatch, AndTrait, traits
 
 "And (Intersection) Trait"
 struct AndTrait{T} end 
