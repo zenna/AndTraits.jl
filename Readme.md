@@ -17,54 +17,42 @@ First make some traits
 
 ```julia
 # This is a trait
-const SomeTrait = Trait{:Err}
-
-# This is another trait
-const SomeOtherTrait = Trait{:Whut}
+const Iterable = Trait{:Iterable}
 ```
+
+```julia
+# This is another trait
+const Indexable = Trait{:Indexable}
+```
+
 
 Now let's give some types these traits
 
 ```julia
-sup(::Type{Array{Int, 1}}, ::SomeTrait) = true
-sup(::Type{Array{Int, 1}}, ::SomeOtherTrait) = true
-
-AndTraits.traits(::Array{Int, 1}) = SomeTrait
-AndTraits.traits(::Array{Int, 1}) = SomeOtherTrait
-
-
-abstract type AbstractTrait end
-struct Dog <: Smelly end
-struct Cat <: Smelly end
-struct LLama <: Smelly end
-
-hastrait(::Type{Array{Int, 1}}, ::Type{Cat}) = true
-hastrait(::Type{Array{Int, 1}}, ::Type{Dog}) = true
-hastrait(::Type{Array{Int, 1}}, ::Type{LLama}) = true
-hastrait(t, x) = false
-
-function thatraits(::Type{T}) where T
-  types = filter(t->sup(T, t), subtypes(Smelly))
-  Union{types...}
-end
-
-x(::trait(Cat, Dog)) = traits()
+AndTraits.traits(::Vector) = Iterable ∧ Indexable
+AndTraits.traits(::Set) = Iterable
 ```
 
-Now let's write some methods:
+Now let's define some methods that use these trarts
+
+```
+g(x) = g(traits(x), x)
+g(::traitmatch(Iterable), x) = "This is a string"
+g(::traitmatch(Iterable, Indexable), x) = 21
+```
+
+Now let's evaluate `g` on some different inputs
 
 ```julia
-f(x) = f(traits(x), x)
-f(::trait(SomeTrait)) = :ok
-f(::trait(SomeTrait)) = :ok
+@test g(x) == 21
+@test g(Set([1,2,3])) == "This is a string"
 ```
 
 # How does this compare to?
 
 ## Abstract Types
 
-1. A type can belong to many
-2. types can be made part of traits after they have been defined
+A type can belong to many traits
 
 ## Holy Traits
 
@@ -74,7 +62,7 @@ But, when you use the traits, you have to decide at the point of dispatch which 
 So for example we can define the trait `SomeTrait` as above, but we also need to define a trait dispatch method `hasSomeTrait`, such that `hasSomeTrait(t)`
 So you right methods of the form:
 
-```
+```julia
 f(x) = f(hasSomeTrait(x), x) 
 f(::SomeTrait, x) = ...
 ```
